@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Treino Direto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: app de uma coluna, largura de celular, abas embaixo; números grandes onde o aluno precisa ler de longe */
+:root{
+  --bg:#F1F2F6; --surface:#FFFFFF; --ink:#151A2D; --muted:#5B6277; --line:#DCDFE8;
+  --accent:#2B44D6; --accent-ink:#FFFFFF; --accent-soft:#E3E7FC;
+  --plate:#F2B705; --plate-ink:#1B1600;
+  --ok:#1D7F46; --ok-soft:#DDF2E5; --warn:#9A5B00; --warn-soft:#FBEBCF; --bad:#B8302A; --bad-soft:#F9DCDA;
+  --display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1120; --surface:#171B2D; --ink:#ECEEF6; --muted:#9AA1B7; --line:#2A2F46;
+  --accent:#8796FF; --accent-ink:#0E1120; --accent-soft:#222A55;
+  --plate:#F2B705; --plate-ink:#1B1600;
+  --ok:#55C786; --ok-soft:#14321F; --warn:#E8A646; --warn-soft:#3A2B10; --bad:#F2716A; --bad-soft:#3E1A19;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1120; --surface:#171B2D; --ink:#ECEEF6; --muted:#9AA1B7; --line:#2A2F46;
+  --accent:#8796FF; --accent-ink:#0E1120; --accent-soft:#222A55;
+  --plate:#F2B705; --plate-ink:#1B1600;
+  --ok:#55C786; --ok-soft:#14321F; --warn:#E8A646; --warn-soft:#3A2B10; --bad:#F2716A; --bad-soft:#3E1A19;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+.shell{max-width:480px;margin:0 auto;min-height:100%;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 120px}
+h1,h2,h3{font-family:var(--display);font-stretch:85%;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:1.75rem;font-weight:800}
+h2{font-size:1.3rem;font-weight:750}
+h3{font-size:1.05rem;font-weight:700}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+.num{font-variant-numeric:tabular-nums}
+
+/* topo */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px 10px}
+.brand{display:flex;align-items:center;gap:8px;font-family:var(--display);font-stretch:80%;font-weight:800;font-size:1.25rem}
+.brand i{width:26px;height:14px;border-radius:3px;background:var(--accent);position:relative;display:inline-block}
+.brand i::before,.brand i::after{content:"";position:absolute;top:-4px;width:6px;height:22px;border-radius:2px;background:var(--ink)}
+.brand i::before{left:-4px}.brand i::after{right:-4px}
+.switch{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px}
+.switch button{border:0;background:none;padding:7px 14px;border-radius:999px;font-weight:600;font-size:.9rem;color:var(--muted)}
+.switch button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.demo{font-size:.8rem;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;margin-bottom:14px}
+
+/* blocos */
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;align-items:center;gap:12px}
+.between{justify-content:space-between}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.list{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.item{display:flex;align-items:center;gap:12px;padding:13px 16px;border-top:1px solid var(--line);width:100%;text-align:left;background:none;border-left:0;border-right:0;border-bottom:0}
+.item:first-child{border-top:0}
+.item .grow{flex:1;min-width:0}
+.ava{width:42px;height:42px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-stretch:85%;flex:none}
+.pill{font-size:.78rem;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.pago{background:var(--ok-soft);color:var(--ok)}
+.pendente{background:var(--warn-soft);color:var(--warn)}
+.atrasado{background:var(--bad-soft);color:var(--bad)}
+.btn{border:0;border-radius:12px;padding:13px 18px;font-weight:700;background:var(--accent);color:var(--accent-ink);min-height:48px}
+.btn.ghost{background:var(--accent-soft);color:var(--accent)}
+.btn.line{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+.btn.block{width:100%}
+.btn.sm{min-height:36px;padding:7px 12px;font-size:.88rem;border-radius:10px}
+.x{border:0;background:none;color:var(--muted);font-size:1.3rem;width:40px;height:40px;border-radius:10px;flex:none}
+.x:hover{background:var(--bg)}
+.back{border:0;background:none;color:var(--accent);font-weight:700;padding:6px 0}
+
+/* formulários */
+.form{display:grid;gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+label.f{display:grid;gap:4px;font-size:.82rem;font-weight:600;color:var(--muted);min-width:0}
+input,select,textarea{width:100%;min-width:0;background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;font-size:1rem}
+textarea{min-height:80px;resize:vertical}
+.check{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.check:first-child{border-top:0}
+.check input{width:22px;height:22px;flex:none;accent-color:var(--accent)}
+
+/* abas */
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 16px;font-weight:700}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+.seg button{border:0;background:none;border-radius:9px;padding:9px 4px;font-weight:700;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.nav div{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+.nav button{border:0;background:none;padding:10px 4px 12px;font-weight:700;font-size:.82rem;color:var(--muted);display:grid;justify-items:center;gap:3px}
+.nav button svg{width:24px;height:24px}
+.nav button[aria-current="page"]{color:var(--accent)}
+
+/* exercício na ficha do personal */
+.ex .grow b{display:block;font-weight:700}
+.ex .grow>span{display:block}
+.vlink{color:var(--accent);font-weight:700;text-decoration:none;display:inline-block;margin-top:3px}
+a.btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.vbtn{margin-bottom:14px}
+.ex .order{font-family:var(--display);font-stretch:80%;font-weight:800;color:var(--muted);width:20px;flex:none}
+
+/* números */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.stat .v{font-family:var(--display);font-stretch:80%;font-weight:800;font-size:1.8rem;line-height:1.1}
+.stat .d{font-size:.8rem;font-weight:700}
+.up{color:var(--ok)}.down{color:var(--ok)}.bad{color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:right;padding:9px 8px;border-top:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-top:0}
+.scroll{overflow-x:auto}
+
+/* modo aluno */
+.hello h1{font-size:2rem}
+.prog{height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--ok);transition:width .3s}
+.work{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px}
+.work.done{border-color:var(--ok)}
+.work .load{display:flex;gap:18px;margin:8px 0 12px;flex-wrap:wrap}
+.work .load div{display:grid}
+.work .load b{font-family:var(--display);font-stretch:80%;font-weight:800;font-size:1.9rem;line-height:1}
+.work .load span{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+.sets{display:flex;gap:10px;flex-wrap:wrap}
+.set{width:54px;height:54px;border-radius:50%;border:2px solid var(--line);background:var(--bg);font-family:var(--display);font-weight:800;font-size:1.2rem}
+.set[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.finish{text-align:center;padding:26px 18px}
+.finish .big{font-family:var(--display);font-stretch:80%;font-weight:800;font-size:2.4rem;color:var(--ok)}
+
+/* cronômetro */
+.timer{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--plate);color:var(--plate-ink);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.timer div{max-width:480px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px}
+.timer .t{font-family:var(--display);font-stretch:75%;font-weight:800;font-size:2.6rem;line-height:1;font-variant-numeric:tabular-nums}
+.timer button{border:2px solid var(--plate-ink);background:transparent;color:var(--plate-ink);border-radius:12px;padding:10px 16px;font-weight:800}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:12px;font-weight:600;z-index:9;max-width:calc(100% - 32px)}
+.empty{text-align:center;padding:22px 12px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:360px){.grid4{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="top">
+    <div class="brand"><i></i>Treino Direto</div>
+    <div class="switch" role="group" aria-label="Ver como">
+      <button id="m-personal" data-act="mode" data-v="personal">Personal</button>
+      <button id="m-aluno" data-act="mode" data-v="aluno">Aluno</button>
+    </div>
+  </header>
+  <div class="demo">Protótipo com alunos de exemplo. O que você muda fica salvo só neste navegador.</div>
+  <main id="app"></main>
+</div>
+<nav class="nav" id="nav"><div>
+  <button data-act="tab" data-v="alunos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c2 .7 3.2 2.5 3.5 5.2"/></svg>Alunos</button>
+  <button data-act="tab" data-v="pagamentos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19M6.5 15h4"/></svg>Pagamentos</button>
+  <button data-act="tab" data-v="plano"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Minha conta</button>
+</div></nav>
+<div class="timer" id="timer" hidden><div>
+  <div><div class="small" style="font-weight:700">Descanso</div><div class="t" id="tval">0:00</div></div>
+  <div class="row"><button data-act="t-add">+15s</button><button data-act="t-stop">Pular</button></div>
+</div></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const KEY='treino-direto-v1';
+const seed=()=>({
+  alunos:[
+    {id:'a1',nome:'Ana Lima',tipo:'Consultoria on-line',valor:180,dia:10,status:'pago',
+      fichas:{A:{nome:'Inferiores',ex:[
+        {n:'Agachamento livre',s:4,r:'10',c:'40 kg',d:90},
+        {n:'Leg press 45°',s:3,r:'12',c:'120 kg',d:60},
+        {n:'Cadeira extensora',s:3,r:'12',c:'30 kg',d:60},
+        {n:'Stiff com barra',s:3,r:'10',c:'30 kg',d:90},
+        {n:'Panturrilha em pé',s:4,r:'15',c:'40 kg',d:45}]},
+       B:{nome:'Superiores',ex:[
+        {n:'Supino reto com halteres',s:3,r:'10',c:'14 kg',d:90},
+        {n:'Remada baixa',s:3,r:'12',c:'35 kg',d:60},
+        {n:'Puxada frontal',s:3,r:'12',c:'35 kg',d:60},
+        {n:'Desenvolvimento com halteres',s:3,r:'10',c:'10 kg',d:60},
+        {n:'Prancha',s:3,r:'30 s',c:'peso corporal',d:45}]}},
+      aval:[
+        {data:'2026-06-10',peso:68.4,gord:29.1,musc:46.2,cint:78},
+        {data:'2026-08-12',peso:67.2,gord:27.8,musc:46.9,cint:76},
+        {data:'2026-10-08',peso:66.5,gord:26.9,musc:47.4,cint:75}],
+      anam:{obj:'Emagrecimento',dias:'4',dor:true,card:false,pres:false,cir:false,med:false,obs:'Dor leve no joelho direito ao descer escadas.',lgpd:true}},
+    {id:'a2',nome:'Carlos Mendes',tipo:'Presencial · academia',valor:350,dia:5,status:'atrasado',
+      fichas:{A:{nome:'Corpo inteiro',ex:[
+        {n:'Agachamento no Smith',s:3,r:'12',c:'30 kg',d:60},
+        {n:'Supino máquina',s:3,r:'12',c:'25 kg',d:60},
+        {n:'Remada unilateral',s:3,r:'12',c:'12 kg',d:60},
+        {n:'Caminhada na esteira',s:1,r:'20 min',c:'5,5 km/h',d:0}]}},
+      aval:[{data:'2026-09-02',peso:91.8,gord:31.5,musc:58.3,cint:104}],
+      anam:{obj:'Saúde e qualidade de vida',dias:'3',dor:false,card:false,pres:true,cir:false,med:true,obs:'Toma remédio para pressão. Liberado pelo médico.',lgpd:true}},
+    {id:'a3',nome:'Marina Souza',tipo:'Presencial · condomínio',valor:200,dia:20,status:'pendente',
+      fichas:{A:{nome:'Força',ex:[
+        {n:'Levantamento terra',s:4,r:'6',c:'60 kg',d:120},
+        {n:'Barra fixa assistida',s:4,r:'8',c:'elástico',d:90}]}},
+      aval:[],anam:{obj:'Ganho de força',dias:'3',dor:false,card:false,pres:false,cir:false,med:false,obs:'',lgpd:false}},
+    {id:'a4',nome:'Roberto Alves',tipo:'Presencial · em casa',valor:350,dia:15,status:'pago',
+      fichas:{A:{nome:'Mobilidade e força',ex:[
+        {n:'Sentar e levantar da cadeira',s:3,r:'12',c:'peso corporal',d:60},
+        {n:'Remada com elástico',s:3,r:'15',c:'elástico médio',d:60}]}},
+      aval:[{data:'2026-09-20',peso:78.0,gord:24.2,musc:52.0,cint:94}],
+      anam:{obj:'Saúde e qualidade de vida',dias:'2',dor:true,card:false,pres:false,cir:true,med:false,obs:'Cirurgia de quadril há 1 ano.',lgpd:true}}
+  ]});
+let D;
+try{D=JSON.parse(localStorage.getItem(KEY))||seed()}catch(e){D=seed()}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}};
+const S={mode:'personal',tab:'alunos',aluno:null,sub:'treino',ficha:'A',addAluno:false,
+  vista:{id:'a1',ficha:'A',feito:{}}};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const dt=s=>{const [y,m,d]=s.split('-');return `${d}/${m}/${y}`};
+const ini=n=>n.split(' ').filter(Boolean).slice(0,2).map(p=>p[0]).join('').toUpperCase();
+const al=id=>D.alunos.find(a=>a.id===id);
+const ST={pago:'Pago',pendente:'A vencer',atrasado:'Atrasado'};
+const fmtNum=v=>(+v).toLocaleString('pt-BR',{maximumFractionDigits:1});
+function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2200)}
+
+/* ---------- personal ---------- */
+function vAlunos(){
+  const form=S.addAluno?`
+  <form class="card form" id="f-aluno">
+    <h3>Novo aluno</h3>
+    <label class="f">Nome<input id="na-nome" required placeholder="Ex.: João Pereira"></label>
+    <label class="f">Atendimento<select id="na-tipo"><option>Presencial · academia</option><option>Presencial · condomínio</option><option>Presencial · em casa</option><option>Consultoria on-line</option></select></label>
+    <div class="grid2"><label class="f">Mensalidade (R$)<input id="na-valor" type="number" inputmode="decimal" min="0" value="200"></label>
+    <label class="f">Vence todo dia<input id="na-dia" type="number" min="1" max="31" value="10"></label></div>
+    <div class="grid2"><button type="button" class="btn line" data-act="cancel-aluno">Cancelar</button><button class="btn">Salvar aluno</button></div>
+  </form>`:`<button class="btn block" data-act="add-aluno">+ Novo aluno</button>`;
+  return `<div class="stack">
+    <div class="row between"><h1>Seus alunos</h1><span class="muted num">${D.alunos.length} ativos</span></div>
+    ${form}
+    <div class="list">${D.alunos.map(a=>`
+      <button class="item" data-act="open" data-v="${a.id}">
+        <span class="ava">${ini(a.nome)}</span>
+        <span class="grow"><b>${esc(a.nome)}</b><br><span class="small muted">${esc(a.tipo)}</span></span>
+        <span class="pill ${a.status}">${ST[a.status]}</span>
+      </button>`).join('')}</div>
+  </div>`;
+}
+function vAluno(){
+  const a=al(S.aluno);
+  const seg=['treino','avaliacao','anamnese'].map((k,i)=>`<button data-act="sub" data-v="${k}" aria-pressed="${S.sub===k}">${['Treino','Avaliação','Anamnese'][i]}</button>`).join('');
+  let body='';
+  if(S.sub==='treino')body=vTreino(a);
+  if(S.sub==='avaliacao')body=vAval(a);
+  if(S.sub==='anamnese')body=vAnam(a);
+  return `<div class="stack">
+    <button class="back" data-act="tab" data-v="alunos">‹ Alunos</button>
+    <div class="row"><span class="ava">${ini(a.nome)}</span><div class="grow"><h1>${esc(a.nome)}</h1><div class="small muted">${esc(a.tipo)} · ${brl(a.valor)} todo dia ${a.dia}</div></div></div>
+    <div class="seg">${seg}</div>${body}</div>`;
+}
+function vTreino(a){
+  if(!a.fichas[S.ficha])S.ficha=Object.keys(a.fichas)[0]||'A';
+  const f=a.fichas[S.ficha];
+  const chips=Object.keys(a.fichas).map(k=>`<button class="chip" data-act="ficha" data-v="${k}" aria-pressed="${k===S.ficha}">Ficha ${k}</button>`).join('')+`<button class="chip" data-act="nova-ficha">+ Ficha</button>`;
+  const exs=f&&f.ex.length?f.ex.map((e,i)=>`
+    <div class="item ex"><span class="order num">${i+1}</span>
+      <span class="grow"><b>${esc(e.n)}</b><span class="small muted num">${e.s} × ${esc(e.r)} · ${esc(e.c)}${e.d?` · descanso ${e.d}s`:''}</span>
+        <a class="vlink small" href="${esc(vid(e))}" target="_blank" rel="noopener">▶ ${e.v?'Seu vídeo':'Vídeo do YouTube'}</a></span>
+      <button class="x" data-act="del-ex" data-v="${i}" aria-label="Remover ${esc(e.n)}">×</button></div>`).join('')
+    :`<div class="empty">Ficha vazia. Adicione o primeiro exercício abaixo.</div>`;
+  return `<div class="chips">${chips}</div>
+    ${f?`<div class="row between"><h2>Ficha ${S.ficha} · ${esc(f.nome)}</h2></div>
+    <div class="list">${exs}</div>
+    <form class="card form" id="f-ex">
+      <h3>Adicionar exercício</h3>
+      <label class="f">Exercício<input id="ex-n" required list="lib" placeholder="Comece a digitar…"></label>
+      <datalist id="lib">${LIB.map(x=>`<option value="${x}">`).join('')}</datalist>
+      <div class="grid4">
+        <label class="f">Séries<input id="ex-s" type="number" min="1" value="3"></label>
+        <label class="f">Repetições<input id="ex-r" value="12"></label>
+        <label class="f">Carga<input id="ex-c" placeholder="kg"></label>
+        <label class="f">Descanso (s)<input id="ex-d" type="number" min="0" value="60"></label>
+      </div>
+      <label class="f">Vídeo de como fazer (link do YouTube, opcional)<input id="ex-v" type="url" inputmode="url" placeholder="Cole aqui o link do seu vídeo"></label>
+      <div class="small muted">Sem link, o aluno vê uma busca no YouTube pelo nome do exercício.</div>
+      <button class="btn">Adicionar à ficha ${S.ficha}</button>
+    </form>
+    <button class="btn ghost block" data-act="ver-aluno">Ver como o aluno vê</button>`:''}`;
+}
+const vid=e=>/^https?:\/\//.test(e.v||'')?e.v:'https://www.youtube.com/results?search_query='+encodeURIComponent('como fazer '+e.n);
+const LIB=['Agachamento livre','Agachamento no Smith','Afundo','Leg press 45°','Cadeira extensora','Mesa flexora','Stiff com barra','Elevação pélvica','Cadeira abdutora','Panturrilha em pé','Supino reto com barra','Supino reto com halteres','Supino inclinado','Crucifixo','Puxada frontal','Remada baixa','Remada unilateral','Desenvolvimento com halteres','Elevação lateral','Rosca direta','Tríceps na polia','Prancha','Abdominal supra','Caminhada na esteira','Bicicleta ergométrica'];
+function delta(cur,prev,k,unit,goodDown){
+  if(!prev)return '';
+  const d=cur[k]-prev[k];if(Math.abs(d)<0.05)return `<span class="d muted">igual</span>`;
+  const good=goodDown?d<0:d>0;
+  return `<span class="d ${good?'up':'bad'}">${d>0?'+':'−'}${fmtNum(Math.abs(d))}${unit} desde ${dt(prev.data)}</span>`;
+}
+function vAval(a){
+  const L=a.aval[a.aval.length-1],P=a.aval[a.aval.length-2];
+  const today=new Date().toISOString().slice(0,10);
+  const top=L?`<div class="small muted">Última avaliação em ${dt(L.data)}</div>
+    <div class="stats">
+      <div class="stat"><div class="small muted">Peso</div><div class="v num">${fmtNum(L.peso)} kg</div>${delta(L,P,'peso',' kg',true)}</div>
+      <div class="stat"><div class="small muted">Gordura</div><div class="v num">${fmtNum(L.gord)}%</div>${delta(L,P,'gord',' pts',true)}</div>
+      <div class="stat"><div class="small muted">Massa muscular</div><div class="v num">${fmtNum(L.musc)} kg</div>${delta(L,P,'musc',' kg',false)}</div>
+      <div class="stat"><div class="small muted">Cintura</div><div class="v num">${fmtNum(L.cint)} cm</div>${delta(L,P,'cint',' cm',true)}</div>
+    </div>
+    ${a.aval.length>1?`<div class="card scroll"><table class="num"><thead><tr><th>Data</th><th>Peso</th><th>Gord.</th><th>Músc.</th><th>Cint.</th></tr></thead><tbody>
+      ${[...a.aval].reverse().map(v=>`<tr><td>${dt(v.data)}</td><td>${fmtNum(v.peso)}</td><td>${fmtNum(v.gord)}%</td><td>${fmtNum(v.musc)}</td><td>${fmtNum(v.cint)}</td></tr>`).join('')}
+    </tbody></table></div>`:''}`
+    :`<div class="card empty">Nenhuma avaliação ainda. Registre a primeira abaixo.</div>`;
+  return `${top}
+    <form class="card form" id="f-aval">
+      <h3>Nova avaliação</h3>
+      <label class="f">Data<input id="av-data" type="date" value="${today}" required></label>
+      <div class="grid2">
+        <label class="f">Peso (kg)<input id="av-peso" type="number" step="0.1" inputmode="decimal" required></label>
+        <label class="f">Gordura (%)<input id="av-gord" type="number" step="0.1" inputmode="decimal" required></label>
+        <label class="f">Massa muscular (kg)<input id="av-musc" type="number" step="0.1" inputmode="decimal" required></label>
+        <label class="f">Cintura (cm)<input id="av-cint" type="number" step="0.5" inputmode="decimal" required></label>
+      </div>
+      <div class="small muted">Valores da bioimpedância ou das medidas com fita.</div>
+      <button class="btn">Salvar avaliação</button>
+    </form>`;
+}
+function vAnam(a){
+  const n=a.anam;const ck=(k,t)=>`<label class="check"><input type="checkbox" id="an-${k}" ${n[k]?'checked':''}><span>${t}</span></label>`;
+  const opt=(v)=>`<option ${n.obj===v?'selected':''}>${v}</option>`;
+  return `<form class="stack" id="f-anam">
+    <div class="card form">
+      <label class="f">Objetivo principal<select id="an-obj">${['Emagrecimento','Ganho de massa muscular','Ganho de força','Saúde e qualidade de vida','Condicionamento'].map(opt).join('')}</select></label>
+      <label class="f">Dias de treino por semana<select id="an-dias">${[1,2,3,4,5,6].map(d=>`<option ${n.dias==d?'selected':''}>${d}</option>`).join('')}</select></label>
+    </div>
+    <div class="card"><h3 style="margin-bottom:4px">Saúde</h3>
+      ${ck('dor','Sente dor em alguma articulação')}${ck('card','Tem ou teve problema no coração')}${ck('pres','Tem pressão alta')}${ck('cir','Fez cirurgia nos últimos 2 anos')}${ck('med','Usa medicação contínua')}
+    </div>
+    <div class="card form"><label class="f">Observações<textarea id="an-obs" placeholder="Lesões, restrições, liberação médica…">${esc(n.obs)}</textarea></label></div>
+    <div class="card">${ck('lgpd','O aluno autorizou guardar estes dados de saúde (LGPD)')}</div>
+    <button class="btn block">Salvar anamnese</button>
+  </form>`;
+}
+function vPag(){
+  const rec=D.alunos.filter(a=>a.status==='pago').reduce((s,a)=>s+a.valor,0);
+  const ab=D.alunos.filter(a=>a.status!=='pago').reduce((s,a)=>s+a.valor,0);
+  const atr=D.alunos.filter(a=>a.status==='atrasado').length;
+  const ord={atrasado:0,pendente:1,pago:2};
+  return `<div class="stack">
+    <h1>Pagamentos de outubro</h1>
+    <div class="stats">
+      <div class="stat"><div class="small muted">Recebido</div><div class="v num up">${brl(rec)}</div></div>
+      <div class="stat"><div class="small muted">A receber</div><div class="v num">${brl(ab)}</div>${atr?`<span class="d bad">${atr} atrasado${atr>1?'s':''}</span>`:''}</div>
+    </div>
+    <div class="list">${[...D.alunos].sort((x,y)=>ord[x.status]-ord[y.status]).map(a=>`
+      <div class="item"><span class="grow"><b>${esc(a.nome)}</b><br><span class="small muted num">${brl(a.valor)} · vence dia ${a.dia}</span></span>
+        <span class="pill ${a.status}">${ST[a.status]}</span>
+        ${a.status==='pago'?`<button class="btn sm line" data-act="pagar" data-v="${a.id}" aria-label="Desfazer pagamento de ${esc(a.nome)}">Desfazer</button>`:`<button class="btn sm" data-act="pagar" data-v="${a.id}">Recebi</button>`}
+      </div>`).join('')}</div>
+    <div class="small muted">Na versão real, o aluno também pode pagar por Pix dentro do app e o status muda sozinho.</div>
+  </div>`;
+}
+function vPlano(){
+  return `<div class="stack">
+    <h1>Minha conta</h1>
+    <div class="card stack" style="gap:6px">
+      <div class="row between"><h3>Plano Personal</h3><span class="pill pago">Ativo</span></div>
+      <div class="stat" style="border:0;padding:0"><div class="v num">R$ 29,90<span class="small muted" style="font-family:var(--body);font-size:.9rem;font-weight:500"> /mês</span></div></div>
+      <div class="small muted">Alunos ilimitados · próxima cobrança em 14/11/2026</div>
+      <div class="small muted">Valor de exemplo. É aqui que cada personal paga a mensalidade da plataforma para você.</div>
+    </div>
+    <div class="card stack" style="gap:6px"><h3>Link para seus alunos</h3>
+      <div class="small muted">Cada aluno entra com o próprio celular e vê só o treino dele.</div>
+      <input id="link-aluno" readonly value="treinodireto.app/seu-nome">
+    </div>
+    <button class="btn line block" data-act="reset">Voltar aos dados de exemplo</button>
+  </div>`;
+}
+
+/* ---------- aluno ---------- */
+function vVista(){
+  const V=S.vista;const a=al(V.id)||D.alunos[0];V.id=a.id;
+  if(!a.fichas[V.ficha])V.ficha=Object.keys(a.fichas)[0];
+  const f=a.fichas[V.ficha];const ex=f?f.ex:[];
+  const total=ex.reduce((s,e)=>s+e.s,0);
+  const feitos=ex.reduce((s,e,i)=>s+(V.feito[V.ficha+i]||[]).filter(Boolean).length,0);
+  const pct=total?Math.round(feitos/total*100):0;
+  const first=a.nome.split(' ')[0];
+  const pick=`<label class="f small">Ver o app como<select id="vista-aluno">${D.alunos.map(x=>`<option value="${x.id}" ${x.id===a.id?'selected':''}>${esc(x.nome)}</option>`).join('')}</select></label>`;
+  if(total&&feitos===total)return `<div class="stack">${pick}
+    <div class="card finish"><div class="big">Treino feito!</div><p class="muted">Ficha ${V.ficha} · ${esc(f.nome)} concluída. Seu personal vai ver que você treinou hoje.</p>
+    <button class="btn block" data-act="recomecar">Treinar outra ficha</button></div></div>`;
+  return `<div class="stack">${pick}
+    <div class="hello"><div class="muted">Olá, ${esc(first)}</div><h1>Treino de hoje</h1></div>
+    <div class="chips">${Object.keys(a.fichas).map(k=>`<button class="chip" data-act="v-ficha" data-v="${k}" aria-pressed="${k===V.ficha}">Ficha ${k} · ${esc(a.fichas[k].nome)}</button>`).join('')}</div>
+    <div><div class="row between small" style="margin-bottom:6px"><b>${feitos} de ${total} séries</b><span class="muted num">${pct}%</span></div><div class="prog"><i style="width:${pct}%"></i></div></div>
+    ${ex.map((e,i)=>{const fe=V.feito[V.ficha+i]||[];const done=fe.filter(Boolean).length===e.s;
+      return `<div class="work ${done?'done':''}">
+        <div class="row between"><h2>${esc(e.n)}</h2>${done?'<span class="pill pago">Feito</span>':''}</div>
+        <div class="load"><div><b class="num">${e.s}×${esc(e.r)}</b><span>séries × reps</span></div><div><b class="num">${esc(e.c)}</b><span>carga</span></div>${e.d?`<div><b class="num">${e.d}s</b><span>descanso</span></div>`:''}</div>
+        <a class="btn ghost sm vbtn" href="${esc(vid(e))}" target="_blank" rel="noopener">▶ Ver como fazer</a>
+        <div class="sets">${Array.from({length:e.s},(_,j)=>`<button class="set num" data-act="set" data-i="${i}" data-j="${j}" aria-pressed="${!!fe[j]}" aria-label="Série ${j+1}">${j+1}</button>`).join('')}</div>
+      </div>`}).join('')}
+    <div class="small muted" style="text-align:center">Toque no número da série quando terminar. O descanso começa sozinho.</div>
+  </div>`;
+}
+
+/* ---------- render ---------- */
+function render(){
+  $('#m-personal').setAttribute('aria-pressed',S.mode==='personal');
+  $('#m-aluno').setAttribute('aria-pressed',S.mode==='aluno');
+  $('#nav').hidden=S.mode!=='personal';
+  let h='';
+  if(S.mode==='aluno')h=vVista();
+  else if(S.tab==='alunos')h=S.aluno?vAluno():vAlunos();
+  else if(S.tab==='pagamentos')h=vPag();
+  else h=vPlano();
+  $('#app').innerHTML=h;
+  document.querySelectorAll('#nav button').forEach(b=>{if(b.dataset.v===S.tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+}
+
+/* ---------- cronômetro ---------- */
+let T={left:0,h:null};
+function startTimer(s){if(!s)return;T.left=s;$('#timer').hidden=false;tick();clearInterval(T.h);T.h=setInterval(()=>{T.left--;tick();if(T.left<=0){stopTimer();toast('Descanso acabou. Próxima série!');try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}}},1000)}
+function tick(){const m=Math.floor(Math.max(T.left,0)/60),s=Math.max(T.left,0)%60;$('#tval').textContent=`${m}:${String(s).padStart(2,'0')}`}
+function stopTimer(){clearInterval(T.h);$('#timer').hidden=true}
+
+/* ---------- ações ---------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;const v=b.dataset.v;const a=S.aluno&&al(S.aluno);
+  switch(b.dataset.act){
+    case 'mode':S.mode=v;if(v==='personal')stopTimer();break;
+    case 'tab':S.tab=v;S.aluno=null;S.addAluno=false;break;
+    case 'open':S.aluno=v;S.sub='treino';S.ficha='A';break;
+    case 'sub':S.sub=v;break;
+    case 'add-aluno':S.addAluno=true;break;
+    case 'cancel-aluno':S.addAluno=false;break;
+    case 'ficha':S.ficha=v;break;
+    case 'nova-ficha':{const k='ABCDEFGH'.split('').find(l=>!a.fichas[l]);if(!k)return toast('Limite de fichas');a.fichas[k]={nome:'Nova ficha',ex:[]};S.ficha=k;save();toast(`Ficha ${k} criada`);break}
+    case 'del-ex':a.fichas[S.ficha].ex.splice(+v,1);save();toast('Exercício removido');break;
+    case 'ver-aluno':S.mode='aluno';S.vista={id:a.id,ficha:S.ficha,feito:{}};window.scrollTo(0,0);break;
+    case 'pagar':{const x=al(v);x.status=x.status==='pago'?(new Date().getDate()>x.dia?'atrasado':'pendente'):'pago';save();toast(x.status==='pago'?`Pagamento de ${x.nome.split(' ')[0]} registrado`:'Pagamento desfeito');break}
+    case 'reset':D=seed();save();S.tab='alunos';S.aluno=null;S.vista={id:'a1',ficha:'A',feito:{}};toast('Dados de exemplo restaurados');break;
+    case 'v-ficha':S.vista.ficha=v;break;
+    case 'set':{const V=S.vista;const k=V.ficha+b.dataset.i;const arr=V.feito[k]=V.feito[k]||[];const j=+b.dataset.j;arr[j]=!arr[j];
+      if(arr[j]){const e=al(V.id).fichas[V.ficha].ex[+b.dataset.i];const all=al(V.id).fichas[V.ficha].ex.every((x,i)=>(V.feito[V.ficha+i]||[]).filter(Boolean).length===x.s);if(!all)startTimer(e.d);else stopTimer()}
+      break}
+    case 'recomecar':S.vista.feito={};break;
+    case 't-add':T.left+=15;tick();return;
+    case 't-stop':stopTimer();return;
+    default:return;
+  }
+  render();
+});
+document.addEventListener('change',e=>{if(e.target.id==='vista-aluno'){S.vista={id:e.target.value,ficha:'A',feito:{}};stopTimer();render()}});
+document.addEventListener('submit',e=>{
+  e.preventDefault();const id=e.target.id;const val=x=>document.getElementById(x).value.trim();const a=S.aluno&&al(S.aluno);
+  if(id==='f-aluno'){const nome=val('na-nome');if(!nome)return;const dia=Math.min(31,Math.max(1,+val('na-dia')||10));
+    D.alunos.push({id:'a'+Date.now(),nome,tipo:val('na-tipo'),valor:+val('na-valor')||0,dia,status:new Date().getDate()>dia?'atrasado':'pendente',fichas:{A:{nome:'Ficha inicial',ex:[]}},aval:[],anam:{obj:'Saúde e qualidade de vida',dias:'3',obs:''}});
+    S.addAluno=false;save();toast(`${nome.split(' ')[0]} cadastrado`);}
+  if(id==='f-ex'){const n=val('ex-n');if(!n)return;a.fichas[S.ficha].ex.push({n,s:Math.max(1,+val('ex-s')||3),r:val('ex-r')||'12',c:val('ex-c')||'—',d:+val('ex-d')||0,v:val('ex-v')});save();toast('Exercício adicionado');}
+  if(id==='f-aval'){const num=x=>parseFloat(val(x).replace(',','.'));a.aval.push({data:val('av-data'),peso:num('av-peso'),gord:num('av-gord'),musc:num('av-musc'),cint:num('av-cint')});a.aval.sort((x,y)=>x.data.localeCompare(y.data));save();toast('Avaliação salva');}
+  if(id==='f-anam'){const c=x=>document.getElementById('an-'+x).checked;a.anam={obj:val('an-obj'),dias:val('an-dias'),dor:c('dor'),card:c('card'),pres:c('pres'),cir:c('cir'),med:c('med'),obs:val('an-obs'),lgpd:c('lgpd')};save();toast('Anamnese salva');}
+  render();
+});
+render();
+</script>
+
+</body>
+</html>
