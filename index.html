@@ -569,7 +569,8 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}};
 const applyBrand=()=>document.documentElement.style.setProperty('--brand',D.personal.cor||'#2B44D6');
 
 /* ---------- estado ---------- */
-const S={role:'personal',view:'inicio',aid:null,tab:'treino',fi:0,metric:'peso',filtro:'todos',busca:'',modal:null,confirm:null,
+let SO=false;try{SO=/^#aluno$/i.test(location.hash)}catch(e){}
+const S={role:SO?'aluno':'personal',view:'inicio',aid:null,tab:'treino',fi:0,metric:'peso',filtro:'todos',busca:'',modal:null,confirm:null,
  a:{aid:'a1',view:'inicio',metric:'peso'},sess:null,fim:null,rest:null};
 
 /* ---------- regras ---------- */
@@ -782,7 +783,7 @@ function renderAluno(){
  if(S.fim)c=aFim(a);else if(S.a.view==='evol')c=aEvol(a);else if(S.a.view==='pag')c=aPag(a);else c=aInicio(a);
  const st=statusMes(a);
  return '<div class="a-layout"><div class="a-col">'+
- '<div class="viewing"><label for="demo-aluno">Vendo o app como</label><select id="demo-aluno" class="mini-sel">'+D.alunos.map(x=>'<option value="'+x.id+'"'+(x.id===a.id?' selected':'')+'>'+esc(x.nome)+'</option>').join('')+'</select></div>'+
+ (SO?'<div style="height:10px"></div>':'<div class="viewing"><label for="demo-aluno">')+(SO?'':'Vendo o app como</label><select id="demo-aluno" class="mini-sel">'+D.alunos.map(x=>'<option value="'+x.id+'"'+(x.id===a.id?' selected':'')+'>'+esc(x.nome)+'</option>').join('')+'</select></div>')+
  '<header class="a-head"><span class="brand-mark">'+esc(ini(D.personal.nome))+'</span><div class="grow"><span class="bn">'+esc(D.personal.nome)+'</span><span class="xs muted">Personal trainer · '+esc(D.personal.cref)+'</span></div>'+ava(a,'sm')+'</header>'+
  c+'<p class="powered">Feito com <b>Treino Direto</b></p></div></div>'+
  (S.fim?'':'<nav class="bnav" aria-label="Menu do aluno"><div class="bnav-in">'+ANAV.map(([k,n,i])=>'<button data-a="anav" data-v="'+k+'"'+(S.a.view===k?' aria-current="page"':'')+'>'+ic(i)+'<span>'+n+'</span>'+(k==='pag'&&st==='atrasado'?'<span class="badge">1</span>':'')+'</button>').join('')+'</div></nav>');
@@ -973,6 +974,7 @@ const top0=()=>{try{window.scrollTo(0,0)}catch(e){}};
 
 /* ---------- desenho ---------- */
 function render(){
+ if(SO){S.role='aluno';$('#demo').hidden=true}
  $('#demo').innerHTML='<div class="demo-in"><span class="demo-tag">'+ic('eye')+'<span>Demonstração<span class="wide"> com alunos fictícios</span></span></span><div class="switch" role="group" aria-label="Ver o app como"><button data-a="role" data-v="personal" aria-pressed="'+(S.role==='personal')+'">Personal</button><button data-a="role" data-v="aluno" aria-pressed="'+(S.role==='aluno')+'">Aluno</button></div></div>';
  $('#root').innerHTML=S.role==='personal'?renderPersonal():renderAluno();
  renderModal();renderRest();drawCharts();tickElapsed();
